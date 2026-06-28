@@ -3,61 +3,83 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
+import { useAuth } from "@/app/context/AuthContext";
+import { logout } from "@/lib/supabase/server";
+import { getAvatarUrl } from "@/lib/utils/storage";
 
-// Add an interface for the props so TypeScript knows what to expect
 interface NavbarProps {
   onToggleFilter?: () => void;
 }
 
 export default function Navbar({ onToggleFilter }: NavbarProps) {
+  const { user, loading, profile } = useAuth();
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isMobileProfileOpen, setIsMobileProfileOpen] = useState(false);
 
   const notificationRef = useRef<HTMLLIElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
-
+  const profileDropdownRef = useRef<HTMLDivElement>(null);
+  const mobileProfileDropdownRef = useRef<HTMLDivElement>(null);
+  const avatarSrc =
+    profile?.avatar_url && profile.avatar_url.length > 0
+      ? profile.avatar_url
+      : "/user.svg";
+  // Combined, operational click-outside handler for all UI dropdown items
   useEffect(() => {
-    if (!isNotificationOpen) return;
-
     function handleClickOutside(event: MouseEvent) {
       const target = event.target as Node;
-      const isOutsideDesktop =
-        notificationRef.current && !notificationRef.current.contains(target);
-      const isOutsideMobile =
-        mobileMenuRef.current && !mobileMenuRef.current.contains(target);
 
-      if (isOutsideDesktop && isOutsideMobile) {
+      // Desktop Notification
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(target)
+      ) {
         setIsNotificationOpen(false);
       }
-    }
-
-    function handleMobileMenuClickOutside(event: MouseEvent) {
-      if (
-        mobileMenuRef.current &&
-        !mobileMenuRef.current.contains(event.target as Node)
-      ) {
+      // Mobile Hamburger Menu
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(target)) {
         setIsMobileMenuOpen(false);
+      }
+      // Desktop Profile Dropdown
+      if (
+        profileDropdownRef.current &&
+        !profileDropdownRef.current.contains(target)
+      ) {
+        setIsProfileOpen(false);
+      }
+      // Mobile Profile Dropdown
+      if (
+        mobileProfileDropdownRef.current &&
+        !mobileProfileDropdownRef.current.contains(target)
+      ) {
+        setIsMobileProfileOpen(false);
       }
     }
 
+    // Attach listener properly to the document context
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("mousedown", handleMobileMenuClickOutside);
     };
-  }, [isNotificationOpen, isMobileMenuOpen]);
+  }, []);
 
   const notifications: string[] = [];
-
+  const profileName =
+    user?.user_metadata?.full_name || user?.email || "My Account";
+  const profileStatus = loading ? "Checking session" : "Signed in as";
+  console.log(profile);
   return (
-    <header className="bg-white flex items-center w-full h-auto md:h-3">
-      <div className="container flex flex-col md:flex-row md:items-center justify-between md:justify-start w-full py-5 md:py-0 gap-5 md:gap-0">
-        {/* Mobile Top Row: Burger and User */}
+    <header className="bg-white flex items-center w-full h-auto md:h-[128px] border-b border-[#F6F7F9]">
+      <div className="container px-6 lg:px-16 flex flex-col md:flex-row md:items-center justify-between md:justify-start w-full py-5 md:py-0 gap-5 md:gap-0">
+        {/* Mobile Top Row: Burger and User Dropdown */}
         <div className="flex md:hidden justify-between w-full items-center">
           {/* Hamburger Menu Wrapper */}
           <div className="relative" ref={mobileMenuRef}>
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="rounded-full cursor-pointer border border-[#C3D4E9] w-11 h-11 flex items-center justify-center"
+              className="rounded-full cursor-pointer border border-[#C3D4E9] w-11 h-11 flex items-center justify-center bg-white"
             >
               <svg
                 width="24"
@@ -92,8 +114,11 @@ export default function Navbar({ onToggleFilter }: NavbarProps) {
               <div className="absolute left-0 top-14 w-56 bg-white border border-[#C3D4E9] rounded-2xl shadow-lg p-3 z-50 flex flex-col gap-2">
                 <button className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg w-full text-left">
                   <Image src="/heart.svg" alt="Heart" width={20} height={20} />
-                  <span className="`text-secondary-400 font-medium">Favorites</span>
+                  <span className="text-secondary-400 font-medium">
+                    Favorites
+                  </span>
                 </button>
+
                 <div className="relative">
                   <button
                     className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg w-full text-left"
@@ -105,10 +130,11 @@ export default function Navbar({ onToggleFilter }: NavbarProps) {
                       width={20}
                       height={20}
                     />
-                    <span className="`text-secondary-400 font-medium">
+                    <span className="text-secondary-400 font-medium">
                       Notifications
                     </span>
                   </button>
+
                   {isNotificationOpen && (
                     <div className="absolute left-0 top-12 w-70 bg-white border border-[#C3D4E9] rounded-2xl shadow-lg p-4 z-50 flex flex-col gap-3">
                       <h3 className="font-bold text-[#1A202C] text-lg">
@@ -122,6 +148,7 @@ export default function Navbar({ onToggleFilter }: NavbarProps) {
                     </div>
                   )}
                 </div>
+
                 <button className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg w-full text-left">
                   <Image
                     src="/setting-2.svg"
@@ -129,21 +156,57 @@ export default function Navbar({ onToggleFilter }: NavbarProps) {
                     width={20}
                     height={20}
                   />
-                  <span className="`text-secondary-400 font-medium">Settings</span>
+                  <span className="text-secondary-400 font-medium">
+                    Settings
+                  </span>
                 </button>
               </div>
             )}
           </div>
 
-          <button className="rounded-full cursor-pointer border border-[#C3D4E9] w-11 h-11 flex items-center justify-center overflow-hidden">
-            <Image
-              src="/user.svg"
-              alt="User"
-              width={44}
-              height={44}
-              className="object-cover"
-            />
-          </button>
+          {/* Mobile Profile Dropdown Wrapper */}
+          <div className="relative" ref={mobileProfileDropdownRef}>
+            <button
+              onClick={() => setIsMobileProfileOpen(!isMobileProfileOpen)}
+              className="rounded-full cursor-pointer border border-[#C3D4E9] w-11 h-11 flex items-center justify-center overflow-hidden bg-white focus:outline-none"
+            >
+              <Image
+                src="/user.svg"
+                alt="User"
+                width={44}
+                height={44}
+                className="object-cover"
+              />
+            </button>
+
+            {isMobileProfileOpen && (
+              <div className="absolute right-0 top-14 w-48 bg-white border border-[#E0E4EC] rounded-xl shadow-lg py-2 z-50">
+                <div className="px-4 py-2 border-b border-[#F6F7F9] mb-1">
+                  <p className="text-xs font-medium text-[#90A3BF]">
+                    {profileStatus}
+                  </p>
+                  <p className="text-sm font-semibold text-[#1A202C] truncate">
+                    {profileName}
+                  </p>
+                </div>
+                <Link
+                  href="/dashboard"
+                  className="flex w-full px-4 py-2 text-sm text-[#1A202C] hover:bg-[#F6F7F9] transition-colors"
+                >
+                  Dashboard
+                </Link>
+                <hr className="border-[#F6F7F9] my-1" />
+                <form action={logout}>
+                  <button
+                    type="submit"
+                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-medium transition-colors"
+                  >
+                    Log Out
+                  </button>
+                </form>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Logo */}
@@ -155,7 +218,7 @@ export default function Navbar({ onToggleFilter }: NavbarProps) {
         <div className="w-full md:w-auto md:ml-19.25 relative">
           <input
             type="text"
-            className="border border-[#C3D4E9] rounded-full w-full md:w-125 h-12 md:h-11 pl-16 focus:outline-none"
+            className="border border-[#C3D4E9] rounded-full w-full md:w-125 h-12 md:h-11 pl-16 focus:outline-none text-sm text-[#1A202C] placeholder-[#90A3BF]"
             placeholder="Search something here"
           />
           <Image
@@ -166,7 +229,6 @@ export default function Navbar({ onToggleFilter }: NavbarProps) {
             className="absolute left-5 top-1/2 -translate-y-1/2"
           />
 
-          {/* Changed this button to use the new prop */}
           <button
             className="absolute right-3 top-1/2 -translate-y-1/2 p-2 border border-[#C3D4E9] md:border-none rounded-xl md:rounded-none flex items-center justify-center cursor-pointer"
             onClick={onToggleFilter}
@@ -179,7 +241,7 @@ export default function Navbar({ onToggleFilter }: NavbarProps) {
         <div className="hidden md:flex ml-auto items-center gap-5">
           <ul className="flex items-center gap-5">
             <li>
-              <button className="rounded-full cursor-pointer border border-[#C3D4E9] w-11 h-11 flex items-center justify-center">
+              <button className="rounded-full cursor-pointer border border-[#C3D4E9] w-11 h-11 flex items-center justify-center transition-colors hover:bg-gray-50">
                 <Image src="/heart.svg" alt="Heart" width={24} height={24} />
               </button>
             </li>
@@ -198,12 +260,9 @@ export default function Navbar({ onToggleFilter }: NavbarProps) {
 
               {isNotificationOpen && (
                 <div className="absolute right-0 top-14 w-75 bg-white border border-[#C3D4E9] rounded-2xl shadow-lg p-5 z-50 flex flex-col gap-3">
-                  <div className="flex justify-between items-center">
-                    <h3 className="font-bold text-[#1A202C] text-xl">
-                      Notifications
-                    </h3>
-                  </div>
-
+                  <h3 className="font-bold text-[#1A202C] text-xl">
+                    Notifications
+                  </h3>
                   {notifications.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-6 gap-2">
                       <p className="text-[#90A3BF] text-sm font-medium">
@@ -223,27 +282,59 @@ export default function Navbar({ onToggleFilter }: NavbarProps) {
               )}
             </li>
             <li>
-              <button className="rounded-full cursor-pointer border border-[#C3D4E9] w-11 h-11 flex items-center justify-center">
+              <Link href="/settings" className="rounded-full cursor-pointer border border-[#C3D4E9] w-11 h-11 flex items-center justify-center transition-colors hover:bg-gray-50">
                 <Image
                   src="/setting-2.svg"
                   alt="Setting"
                   width={24}
                   height={24}
                 />
-              </button>
+              </Link>
             </li>
           </ul>
 
-          <div>
-            <button className="rounded-full cursor-pointer border border-[#C3D4E9] w-11 h-11 flex items-center justify-center overflow-hidden">
+          {/* Desktop Profile Dropdown Wrapper */}
+          <div className="relative" ref={profileDropdownRef}>
+            <button
+              onClick={() => setIsProfileOpen(!isProfileOpen)}
+              className="rounded-full cursor-pointer border border-[#C3D4E9] w-11 h-11 flex items-center justify-center overflow-hidden hover:border-[#3563E9] transition-colors focus:outline-none bg-white"
+            >
               <Image
-                src="/user.svg"
+                src={profile?.avatar_url || "/user.svg"}
                 alt="User"
                 width={44}
                 height={44}
                 className="object-cover"
               />
             </button>
+
+            {isProfileOpen && (
+              <div className="absolute right-0 mt-2 w-52 bg-white border border-[#E0E4EC] rounded-xl shadow-lg py-2 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+                <div className="px-4 py-2 border-b border-[#F6F7F9] mb-1">
+                  <p className="text-xs font-medium text-[#90A3BF]">
+                    {profileStatus}
+                  </p>
+                  <p className="text-sm font-semibold text-[#1A202C] truncate">
+                    {profileName}
+                  </p>
+                </div>
+                <Link
+                  href="/dashboard"
+                  className="flex w-full px-4 py-2 text-sm text-[#1A202C] hover:bg-[#F6F7F9] transition-colors"
+                >
+                  Dashboard
+                </Link>
+                <hr className="border-[#F6F7F9] my-1" />
+                <form action={logout}>
+                  <button
+                    type="submit"
+                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 font-medium transition-colors focus:outline-none"
+                  >
+                    Log Out
+                  </button>
+                </form>
+              </div>
+            )}
           </div>
         </div>
       </div>

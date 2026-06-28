@@ -23,7 +23,7 @@ export const CarsSection = async ({
       ? searchParams.people.split(",")
       : searchParams?.people || [];
 
-  const maxPrice = searchParams?.price ? parseInt(searchParams.price) : 100;
+  const maxPrice = searchParams?.price ? parseInt(searchParams.price) : 10000000;
   // 2. Build the query
   let query = supabase.from("CARS").select("*");
 
@@ -40,7 +40,7 @@ export const CarsSection = async ({
 
   // 3. Execute
   const { data: allCars, error } = await query;
-
+console.log("cars" ,allCars)
   if (error) {
     console.error("Supabase fetch error:", error);
     return <div>Error loading cars</div>;

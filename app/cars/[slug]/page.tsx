@@ -4,6 +4,7 @@ import StarRating from "@/app/components/car-listing/StarRating";
 import Link from "next/link";
 import { CarsSection } from "@/app/components/car-listing/CarsSection";
 import { createClient } from "@/lib/supabase/server"; // Ensure this path is correct
+import Reviews from "@/app/cars/[slug]/Reviews";
 
 export default async function CarPage({
   params,
@@ -25,11 +26,11 @@ export default async function CarPage({
     .single();
 
   if (error || !car) {
-    return <div className="container py-10">Car not found</div>;
+    return <div className="container px-6 lg:px-16 py-10">Car not found</div>;
   }
 
   return (
-    <div className="container py-8">
+    <div className="container px-6 lg:px-16 py-8">
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
         <CarView car={car} />
 
@@ -98,6 +99,8 @@ export default async function CarPage({
           </div>
         </div>
       </div>
+
+      <Reviews carId={car.id} />
 
       {/* CarsSection is already updated to fetch from Supabase */}
       <CarsSection searchParams={resolvedSearchParams} />

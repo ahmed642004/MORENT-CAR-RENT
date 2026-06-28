@@ -4,10 +4,16 @@ import PickUpDropOff from "./components/PickUpDropOff";
 import { Button } from "./components/Button";
 import Image from "next/image";
 
+type HomeSearchParams = {
+  category?: string | string[];
+  people?: string | string[];
+  price?: string;
+};
+
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<any>;
+  searchParams: Promise<HomeSearchParams>;
 }) {
   const params = await searchParams;
 
@@ -16,10 +22,10 @@ export default async function Home({
   const isFiltering =
     params?.category ||
     params?.people ||
-    (params?.price && parseInt(params.price) < 100);
+    (params?.price && parseInt(params.price) < 10000000);
 
   return (
-    <div className="container transition-all duration-300">
+    <div className="container px-6 lg:px-16 transition-all duration-300">
       {/* Only render the Hero if NOT filtering */}
       {!isFiltering && (
         <>

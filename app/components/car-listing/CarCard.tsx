@@ -3,8 +3,10 @@ import { Car } from "@/types";
 import { HeartButton } from "./HeartButton";
 import { FuelIcon, TransmissionIcon, CapacityIcon } from "./Icons";
 import Link from "next/link";
+import { getImageUrl } from "@/lib/utils/storage";
 
 const CarCard = ({ car }: { car: Car }) => {
+  console.log(car)
   return (
     <div className="w-full bg-white rounded-xl p-4 flex flex-col pt-6">
       <div className="flex justify-between items-start">
@@ -19,7 +21,7 @@ const CarCard = ({ car }: { car: Car }) => {
 
       <div className="flex-1 flex justify-center items-center my-14 h-24 relative">
         <Image
-          src={car.image}
+          src={getImageUrl(car.image)}
           alt={car.name}
           width={264}
           height={108}

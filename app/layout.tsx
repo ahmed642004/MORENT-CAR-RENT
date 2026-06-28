@@ -4,10 +4,12 @@ import "./globals.css";
 import ClientAppLayout from "./components/layout/ClientAppLayout";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { createClient } from "@/lib/supabase/server";
+import { Toaster } from "sonner";
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-plus-jakarta-sans",
 });
+
 
 export const metadata: Metadata = {
   title: "Morent - Car Rental",
@@ -54,6 +56,7 @@ export default async function RootLayout({
           >
             {children}
           </ClientAppLayout>
+          <Toaster position="top-right" richColors />
         </NuqsAdapter>
       </body>
     </html>

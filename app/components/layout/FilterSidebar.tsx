@@ -9,7 +9,6 @@ import {
 
 interface FilterSidebarProps {
   isOpen: boolean;
-  onClose: () => void;
   // We accept the counts as a prop now
   counts: {
     type: Record<string, number>;
@@ -19,7 +18,6 @@ interface FilterSidebarProps {
 
 export default function FilterSidebar({
   isOpen,
-  onClose,
   counts,
 }: FilterSidebarProps) {
   // Bind filters to URL query parameters
@@ -37,9 +35,9 @@ export default function FilterSidebar({
   );
   const [maxPrice, setMaxPrice] = useQueryState(
     "price",
-    parseAsInteger.withDefault(100).withOptions({ shallow: false }),
+    parseAsInteger.withDefault(10000000).withOptions({ shallow: false }),
   );
-  console.log("Current Filters:", counts.type, counts.capacity, maxPrice);
+ 
   // Helper to toggle checkbox values in URL
   const toggleFilter = (
     current: string[],
@@ -124,7 +122,7 @@ export default function FilterSidebar({
           <input
             type="range"
             min="0"
-            max="100"
+            max="100000000"
             step="5"
             value={maxPrice}
             onChange={(e) => setMaxPrice(Number(e.target.value))}
