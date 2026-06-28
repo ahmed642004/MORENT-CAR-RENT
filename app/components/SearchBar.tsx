@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
+import { getImageUrl } from "@/lib/utils/storage";
 
 type Car = {
   id: string;
@@ -127,7 +128,7 @@ export function SearchBar({ onToggleFilter }: SearchBarProps) {
                     {car.image && (
                       <div className="relative w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-[#F6F7F9]">
                         <Image
-                          src={car.image}
+                          src={getImageUrl(car.image)}
                           alt={car.name}
                           fill
                           className="object-cover"
