@@ -13,7 +13,11 @@ type Car = {
   category?: string;
 };
 
-export function SearchBar() {
+interface SearchBarProps {
+  onToggleFilter?: () => void;
+}
+
+export function SearchBar({ onToggleFilter }: SearchBarProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Car[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -74,7 +78,7 @@ export function SearchBar() {
         value={searchQuery}
         onChange={(e) => handleSearch(e.target.value)}
         onFocus={() => searchQuery && setIsOpen(true)}
-        className="border border-[#C3D4E9] rounded-full w-full md:w-125 h-12 md:h-11 pl-16 focus:outline-none text-sm text-[#1A202C] placeholder-[#90A3BF]"
+        className="border border-[#C3D4E9] rounded-full w-full md:w-125 h-12 md:h-11 pl-16 pr-14 focus:outline-none text-sm text-[#1A202C] placeholder-[#90A3BF]"
         placeholder="Search something here"
       />
       <Image
@@ -82,8 +86,15 @@ export function SearchBar() {
         alt="Search"
         width={24}
         height={24}
-        className="absolute left-5 top-1/2 -translate-y-1/2"
+        className="absolute left-5 top-1/2 -translate-y-1/2 pointer-events-none"
       />
+
+      <button
+        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 border border-[#C3D4E9] md:border-none rounded-xl md:rounded-none flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors"
+        onClick={onToggleFilter}
+      >
+        <Image src="/filter.svg" alt="Filter" width={24} height={24} />
+      </button>
 
       {/* Search Results Dropdown */}
       {isOpen && (
