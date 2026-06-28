@@ -1,6 +1,7 @@
 "use server";
 
 import { createServerClient } from "@supabase/ssr";
+import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -48,9 +49,12 @@ export async function login(formData: FormData) {
     return { error: error.message };
   }
 
+  // 2. Clear the router cache so the next page load reads the new cookie
+  revalidatePath("/", "layout");
+
+  // 3. Redirect to the requested page or home
   redirect(redirectTo?.startsWith("/") ? redirectTo : "/");
 }
-
 export async function signup(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
@@ -84,7 +88,6 @@ export async function logout() {
   await supabase.auth.signOut();
   redirect("/login"); // Sends the user right back to the login screen
 }
-
 
 export async function getUser() {
   const supabase = await createClient();

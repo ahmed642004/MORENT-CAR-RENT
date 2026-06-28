@@ -82,6 +82,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (!mounted) return;
 
+      setLoading(true);
+
       setUser(session?.user ?? null);
 
       if (session?.user) {
@@ -93,8 +95,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         setProfile(null);
       }
-    });
 
+      setLoading(false);
+    });
     return () => {
       mounted = false;
       subscription.unsubscribe();
