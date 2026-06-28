@@ -39,7 +39,7 @@ const ComponentName: FC<ComponentNameProps> = ({ car }) => {
         />
       </div>
       {/* Thumbnail Row */}
-      <div className="grid grid-cols-3 gap-9 w-fit">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6 w-fit">
         {car.thumbnail.map((imagePath, index) => (
           <div
             key={index} // Use the index for the React key
