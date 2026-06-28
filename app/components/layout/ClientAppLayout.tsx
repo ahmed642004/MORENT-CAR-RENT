@@ -6,24 +6,41 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import FilterSidebar from "./FilterSidebar";
 import { AuthProvider } from "@/app/context/AuthContext";
+import { User } from "@supabase/supabase-js";
+
+type Profile = {
+  id: string;
+  full_name: string | null;
+  avatar_url: string | null;
+};
+
+interface ClientAppLayoutProps {
+  children: React.ReactNode;
+  counts: { type: Record<string, number>; capacity: Record<string, number> };
+  initialUser?: User | null;
+  initialProfile?: Profile | null;
+}
 
 export default function ClientAppLayout({
   children,
   counts,
-}: {
-  children: React.ReactNode;
-  counts: { type: Record<string, number>; capacity: Record<string, number> };
-}) {
+  initialUser = null,
+  initialProfile = null,
+}: ClientAppLayoutProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const pathname = usePathname();
   const isAuthPage = pathname.startsWith("/login");
 
   if (isAuthPage) {
-    return <AuthProvider>{children}</AuthProvider>;
+    return (
+      <AuthProvider>
+        {children}
+      </AuthProvider>
+    );
   }
 
   return (
-    <AuthProvider>
+    <AuthProvider initialUser={initialUser} initialProfile={initialProfile}>
       <Navbar onToggleFilter={() => setIsFilterOpen(!isFilterOpen)} />
 
       <div className="flex relative flex-1 transition-all duration-300">
