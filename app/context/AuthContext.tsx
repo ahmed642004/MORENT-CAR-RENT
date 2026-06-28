@@ -26,12 +26,22 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+interface AuthProviderProps {
+  children: ReactNode;
+  initialUser?: User | null;
+  initialProfile?: Profile | null;
+}
+
+export function AuthProvider({
+  children,
+  initialUser = null,
+  initialProfile = null,
+}: AuthProviderProps) {
   const supabase = useMemo(() => createClient(), []);
 
-  const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(initialUser ?? null);
+  const [profile, setProfile] = useState<Profile | null>(initialProfile ?? null);
+  const [loading, setLoading] = useState(!initialUser); // Only loading if we didn't get initial state
 
   async function loadProfile(userId: string): Promise<Profile | null> {
     const { data, error } = await supabase
@@ -51,31 +61,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let mounted = true;
 
-    async function initialize() {
-      setLoading(true);
+    // Only initialize if we don't have initial state already
+    if (!initialUser) {
+      async function initialize() {
+        setLoading(true);
 
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!mounted) return;
-
-      setUser(user);
-
-      if (user) {
-        const profile = await loadProfile(user.id);
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
 
         if (!mounted) return;
 
-        setProfile(profile);
-      } else {
-        setProfile(null);
+        setUser(user);
+
+        if (user) {
+          const profile = await loadProfile(user.id);
+
+          if (!mounted) return;
+
+          setProfile(profile);
+        } else {
+          setProfile(null);
+        }
+
+        setLoading(false);
       }
 
+      initialize();
+    } else {
+      // We have initial state, so we're not loading anymore
       setLoading(false);
     }
-
-    initialize();
 
     const {
       data: { subscription },
@@ -98,11 +114,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       setLoading(false);
     });
+
     return () => {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [supabase]);
+  }, [supabase, initialUser]);
 
   async function signOut() {
     await supabase.auth.signOut();
