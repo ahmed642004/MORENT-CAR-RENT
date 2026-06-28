@@ -214,8 +214,8 @@ export default function Navbar({ onToggleFilter }: NavbarProps) {
           <Image src="/Logo.png" alt="Logo" width={135} height={34} />
         </Link>
 
-        {/* Search bar - Using new SearchBar component */}
-        <SearchBar />
+        {/* Search bar - Using new SearchBar component with onToggleFilter prop */}
+        <SearchBar onToggleFilter={onToggleFilter} />
 
         {/* Desktop Right Section (Icons + User) */}
         <div className="hidden md:flex ml-auto items-center gap-5">
