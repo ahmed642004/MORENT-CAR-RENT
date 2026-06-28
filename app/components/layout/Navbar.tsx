@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import { logout } from "@/lib/supabase/server";
-import { SearchBar } from "./SearchBar";
+import { SearchBar } from "../SearchBar";
 
 interface NavbarProps {
   onToggleFilter?: () => void;
