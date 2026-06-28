@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import { logout } from "@/lib/supabase/server";
-import { getAvatarUrl } from "@/lib/utils/storage";
+import { SearchBar } from "./SearchBar";
 
 interface NavbarProps {
   onToggleFilter?: () => void;
@@ -214,28 +214,8 @@ export default function Navbar({ onToggleFilter }: NavbarProps) {
           <Image src="/Logo.png" alt="Logo" width={135} height={34} />
         </Link>
 
-        {/* Search bar */}
-        <div className="w-full md:w-auto md:ml-19.25 relative">
-          <input
-            type="text"
-            className="border border-[#C3D4E9] rounded-full w-full md:w-125 h-12 md:h-11 pl-16 focus:outline-none text-sm text-[#1A202C] placeholder-[#90A3BF]"
-            placeholder="Search something here"
-          />
-          <Image
-            src="/search-normal.svg"
-            alt="Search"
-            width={24}
-            height={24}
-            className="absolute left-5 top-1/2 -translate-y-1/2"
-          />
-
-          <button
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-2 border border-[#C3D4E9] md:border-none rounded-xl md:rounded-none flex items-center justify-center cursor-pointer"
-            onClick={onToggleFilter}
-          >
-            <Image src="/filter.svg" alt="Filter" width={24} height={24} />
-          </button>
-        </div>
+        {/* Search bar - Using new SearchBar component */}
+        <SearchBar />
 
         {/* Desktop Right Section (Icons + User) */}
         <div className="hidden md:flex ml-auto items-center gap-5">
@@ -297,7 +277,7 @@ export default function Navbar({ onToggleFilter }: NavbarProps) {
           <div className="relative" ref={profileDropdownRef}>
             <button
               onClick={() => setIsProfileOpen(!isProfileOpen)}
-              className="rounded-full cursor-pointer border border-[#C3D4E9] w-11 h-11 flex items-center justify-center overflow-hidden hover:border-[#3563E9] transition-colors focus:outline-none bg-white"
+              className="rounded-full cursor-pointer border border-[#C3D4E9] w-11 h-11 flex items-center justify-center overflow-hidden hover:border-[#3563E9] transition-colors focus:outline-none"
             >
               <Image
                 src={profile?.avatar_url || "/user.svg"}
