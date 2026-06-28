@@ -4,6 +4,7 @@ import { createServerClient } from "@supabase/ssr";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { User } from "@supabase/supabase-js";
 
 export async function createClient() {
   const cookieStore = await cookies();
@@ -96,4 +97,36 @@ export async function getUser() {
   } = await supabase.auth.getUser();
 
   return user;
+}
+
+// New function to get initial auth state (user + profile) server-side
+export async function getInitialAuthState(): Promise<{
+  user: User | null;
+  profile: {
+    id: string;
+    full_name: string | null;
+    avatar_url: string | null;
+  } | null;
+}> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let profile = null;
+
+  if (user) {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("id, full_name, avatar_url")
+      .eq("id", user.id)
+      .single();
+
+    if (!error && data) {
+      profile = data;
+    }
+  }
+
+  return { user, profile };
 }
