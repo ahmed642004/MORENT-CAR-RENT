@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 type Car = {
   id: string;
   name: string;
+  slug: string;
   image?: string;
   price: number;
   category?: string;
@@ -40,7 +41,7 @@ export function SearchBar({ onToggleFilter }: SearchBarProps) {
     try {
       const { data, error } = await supabase.current
         .from("CARS")
-        .select("id, name, image, price, category")
+        .select("id, name, slug, image, price, category")
         .or(`name.ilike.%${query}%,category.ilike.%${query}%`)
         .limit(8);
 
@@ -116,7 +117,7 @@ export function SearchBar({ onToggleFilter }: SearchBarProps) {
               {searchResults.map((car) => (
                 <li key={car.id}>
                   <Link
-                    href={`/cars/${car.id}`}
+                    href={`/cars/${car.slug}`}
                     onClick={() => {
                       setIsOpen(false);
                       setSearchQuery("");
