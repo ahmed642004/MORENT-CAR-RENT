@@ -5,11 +5,12 @@ import ClientAppLayout from "./components/layout/ClientAppLayout";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { createClient } from "@/lib/supabase/server";
 import { Toaster } from "sonner";
+import { getInitialAuthState } from "@/lib/supabase/server";
+
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-plus-jakarta-sans",
 });
-
 
 export const metadata: Metadata = {
   title: "Morent - Car Rental",
@@ -22,6 +23,9 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const supabase = await createClient();
+
+  // Fetch initial auth state server-side
+  const { user: initialUser, profile: initialProfile } = await getInitialAuthState();
 
   // Fetch only the data needed for the counts
   const { data: cars } = await supabase.from("CARS").select("category, people");
@@ -53,6 +57,8 @@ export default async function RootLayout({
         <NuqsAdapter>
           <ClientAppLayout
             counts={{ type: typeCounts, capacity: capacityCounts }}
+            initialUser={initialUser}
+            initialProfile={initialProfile}
           >
             {children}
           </ClientAppLayout>
