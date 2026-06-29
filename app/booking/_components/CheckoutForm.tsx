@@ -208,13 +208,12 @@ function OrderSummary({ car }: { car: CheckoutCar }) {
       </p>
 
       <div className="mt-8 flex items-center gap-4 border-b border-secondary-100 pb-8">
-        <div className="relative h-20 w-32 overflow-hidden rounded bg-primary-500">
+        <div className="relative h-20 w-32 overflow-hidden rounded">
           <Image
             src={imageSource}
             alt={car.name}
             fill
             sizes="128px"
-            className="object-contain p-2"
           />
         </div>
         <div className="min-w-0">
@@ -323,7 +322,7 @@ export default function CheckoutForm({ car }: CheckoutFormProps) {
 
     reset();
     setToast("Rental order created successfully.");
-    setTimeout(() => router.push("/dashboard/orders"), 900);
+    setTimeout(() => router.push("/orders"), 900);
   }
 
   useEffect(() => {

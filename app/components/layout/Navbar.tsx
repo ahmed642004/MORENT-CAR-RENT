@@ -67,8 +67,12 @@ export default function Navbar({ onToggleFilter }: NavbarProps) {
 
   const notifications: string[] = [];
   const profileName =
-    user?.user_metadata?.full_name || user?.email || "My Account";
+    profile?.full_name ||
+    user?.user_metadata?.full_name ||
+    user?.email ||
+    "My Account";
   const profileStatus = loading ? "Checking session" : "Signed in as";
+  console.log(user);
   return (
     <header className="bg-white flex items-center w-full h-auto md:h-[128px] border-b border-[#F6F7F9]">
       <div className="container px-6 lg:px-16 flex flex-col md:flex-row md:items-center justify-between md:justify-start w-full py-5 md:py-0 gap-5 md:gap-0">
@@ -170,7 +174,7 @@ export default function Navbar({ onToggleFilter }: NavbarProps) {
               className="rounded-full cursor-pointer border border-[#C3D4E9] w-11 h-11 flex items-center justify-center overflow-hidden bg-white focus:outline-none"
             >
               <Image
-                src="/user.svg"
+                src={avatarSrc}
                 alt="User"
                 width={44}
                 height={44}
@@ -189,10 +193,10 @@ export default function Navbar({ onToggleFilter }: NavbarProps) {
                   </p>
                 </div>
                 <Link
-                  href="/dashboard"
+                  href="/orders"
                   className="flex w-full px-4 py-2 text-sm text-[#1A202C] hover:bg-[#F6F7F9] transition-colors"
                 >
-                  Dashboard
+                  Orders
                 </Link>
                 <hr className="border-[#F6F7F9] my-1" />
                 <form action={logout}>
@@ -261,7 +265,10 @@ export default function Navbar({ onToggleFilter }: NavbarProps) {
               )}
             </li>
             <li>
-              <Link href="/settings" className="rounded-full cursor-pointer border border-[#C3D4E9] w-11 h-11 flex items-center justify-center transition-colors hover:bg-gray-50">
+              <Link
+                href="/settings"
+                className="rounded-full cursor-pointer border border-[#C3D4E9] w-11 h-11 flex items-center justify-center transition-colors hover:bg-gray-50"
+              >
                 <Image
                   src="/setting-2.svg"
                   alt="Setting"
@@ -279,7 +286,7 @@ export default function Navbar({ onToggleFilter }: NavbarProps) {
               className="rounded-full cursor-pointer border border-[#C3D4E9] w-11 h-11 flex items-center justify-center overflow-hidden hover:border-[#3563E9] transition-colors focus:outline-none"
             >
               <Image
-                src={profile?.avatar_url || "/user.svg"}
+                src={avatarSrc}
                 alt="User"
                 width={44}
                 height={44}
@@ -298,10 +305,10 @@ export default function Navbar({ onToggleFilter }: NavbarProps) {
                   </p>
                 </div>
                 <Link
-                  href="/dashboard"
+                  href="/orders"
                   className="flex w-full px-4 py-2 text-sm text-[#1A202C] hover:bg-[#F6F7F9] transition-colors"
                 >
-                  Dashboard
+                  Orders
                 </Link>
                 <hr className="border-[#F6F7F9] my-1" />
                 <form action={logout}>

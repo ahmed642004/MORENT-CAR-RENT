@@ -42,7 +42,28 @@ export default function LoginPage() {
           setStatusMessage({ type: "error", text: result.error });
         }
       }
-    } catch {
+    } catch (err: unknown) {
+      // Define a structural type for what a Next.js redirect error looks like
+      type RedirectError = { message: string; digest?: string };
+
+      // Helper function to narrow down the 'unknown' type safely
+      const isObject = (item: unknown): item is Record<string, unknown> => {
+        return typeof item === "object" && item !== null;
+      };
+
+      if (isObject(err)) {
+        const errorObj = err as RedirectError;
+
+        // Check if it's the internal Next.js redirect mechanism
+        if (
+          errorObj.message?.includes("NEXT_REDIRECT") ||
+          errorObj.digest?.includes("NEXT_REDIRECT")
+        ) {
+          return; // Stop execution and let the redirect happen naturally
+        }
+      }
+
+      // Handle actual system errors
       setStatusMessage({
         type: "error",
         text: "An unexpected system error occurred.",
@@ -51,7 +72,6 @@ export default function LoginPage() {
       setIsLoading(false);
     }
   };
-
   return (
     <div className="min-h-screen bg-[#F6F7F9] flex items-center justify-center p-4 antialiased font-sans">
       <div className="max-w-5xl w-full bg-white rounded-2xl shadow-sm border border-[#E0E4EC] overflow-hidden grid md:grid-cols-2 min-h-[600px]">
@@ -157,15 +177,17 @@ export default function LoginPage() {
 
             <div className="flex items-center justify-between pt-1">
               <label className="flex items-center space-x-2 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  name="rememberMe"
-                  className="w-4 h-4 text-[#3563E9] border-[#E0E4EC] rounded focus:ring-[#3563E9] accent-[#3563E9]"
-                />
+                {isSignUp && (
+                  <input
+                    type="checkbox"
+                    name="terms"
+                    required={isSignUp}
+                    className="w-4 h-4 text-[#3563E9] border-[#E0E4EC] rounded focus:ring-[#3563E9] accent-[#3563E9]"
+                  />
+                )}
+
                 <span className="text-xs text-[#90A3BF] font-medium">
-                  {isSignUp
-                    ? "I agree to the Terms & Conditions"
-                    : "Remember me"}
+                  {isSignUp ? "I agree to the Terms & Conditions" : ""}
                 </span>
               </label>
 

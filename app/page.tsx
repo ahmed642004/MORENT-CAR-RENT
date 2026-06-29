@@ -3,6 +3,7 @@ import { CarsSection } from "./components/car-listing/CarsSection";
 import PickUpDropOff from "./components/PickUpDropOff";
 import { Button } from "./components/Button";
 import Image from "next/image";
+import Link from "next/link";
 
 type HomeSearchParams = {
   category?: string | string[];
@@ -30,7 +31,10 @@ export default async function Home({
       {!isFiltering && (
         <>
           <div className="flex justify-center items-stretch gap-5">
-            <div className="relative rounded-2xl overflow-hidden w-full lg:w-full xl:w-1/2 aspect-video">
+            <Link
+              href="/cars/koenigsegg"
+              className="relative rounded-2xl overflow-hidden w-full lg:w-full xl:w-1/2 aspect-video"
+            >
               <Image
                 src="/BG-2.png"
                 alt="Car"
@@ -49,8 +53,11 @@ export default async function Home({
                   Rental Car
                 </Button>
               </div>
-            </div>
-            <div className="hidden  xl:block relative rounded-2xl overflow-hidden w-1/2 aspect-video">
+            </Link>
+            <Link
+              href="/cars/nissan-gt-r"
+              className="hidden  xl:block relative rounded-2xl overflow-hidden w-1/2 aspect-video"
+            >
               <Image
                 src="/BG.png"
                 alt="Car"
@@ -69,7 +76,7 @@ export default async function Home({
                   Rental Car
                 </Button>
               </div>
-            </div>
+            </Link>
           </div>
           <PickUpDropOff />
         </>

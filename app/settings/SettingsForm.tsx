@@ -91,6 +91,7 @@ export default function SettingsForm({
   // Profile Form React Hook Form
   const {
     register: registerProfile,
+    setValue,
     handleSubmit: handleProfileSubmit,
     formState: { errors: profileErrors, isSubmitting: isProfileSubmitting },
   } = useForm<ProfileFormValues>({
@@ -104,6 +105,7 @@ export default function SettingsForm({
   const {
     register: registerPassword,
     handleSubmit: handlePasswordSubmit,
+
     reset: resetPasswordForm,
     formState: { errors: passwordErrors, isSubmitting: isPasswordSubmitting },
   } = useForm<PasswordFormValues>({
@@ -117,18 +119,23 @@ export default function SettingsForm({
   // Handle Full Name Updates
   const onProfileSave = async (data: ProfileFormValues) => {
     try {
-      const { error } = await supabase.from("profiles").upsert(
-        {
-          id: user.id,
+      // 🟢 Change from .upsert() to .update() targeted directly at the user id
+      const { error } = await supabase
+        .from("profiles")
+        .update({
           full_name: data.fullName,
           avatar_url: avatarUrl,
-        },
-        { onConflict: "id" },
-      );
+        })
+        .eq("id", user.id); // Match the logged-in user's ID
 
       if (error) throw error;
 
+      // 🟢 Manually update the form value state so the input layout matches immediately
+      setValue("fullName", data.fullName);
+
       toast.success("Profile details updated successfully!");
+
+      // Force Next.js to pull fresh layout layouts if the name is displayed in a navbar
       router.refresh();
     } catch (error: any) {
       toast.error(error.message || "Failed to update profile info");
