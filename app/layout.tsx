@@ -15,6 +15,9 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: "Morent - Car Rental",
   description: "The best platform for car rental",
+  verification: {
+    google: "Q_Z4bZmr5xRhooA_xDSByBeYoZ3mALnhnxt32t13dAc",
+  },
 };
 
 export default async function RootLayout({
@@ -25,11 +28,11 @@ export default async function RootLayout({
   const supabase = await createClient();
 
   // Fetch initial auth state server-side
-  const { user: initialUser, profile: initialProfile } = await getInitialAuthState();
+  const { user: initialUser, profile: initialProfile } =
+    await getInitialAuthState();
 
   // Fetch only the data needed for the counts
   const { data: cars } = await supabase.from("CARS").select("category, people");
-  console.log("Fetched cars for counts:", cars);
   const safeCars = cars || [];
   // Calculate counts (your existing logic)
   const typeCounts = safeCars?.reduce(

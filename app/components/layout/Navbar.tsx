@@ -69,7 +69,6 @@ export default function Navbar({ onToggleFilter }: NavbarProps) {
   const profileName =
     user?.user_metadata?.full_name || user?.email || "My Account";
   const profileStatus = loading ? "Checking session" : "Signed in as";
-  console.log(profile);
   return (
     <header className="bg-white flex items-center w-full h-auto md:h-[128px] border-b border-[#F6F7F9]">
       <div className="container px-6 lg:px-16 flex flex-col md:flex-row md:items-center justify-between md:justify-start w-full py-5 md:py-0 gap-5 md:gap-0">

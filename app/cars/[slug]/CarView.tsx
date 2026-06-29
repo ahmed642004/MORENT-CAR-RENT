@@ -13,7 +13,6 @@ interface ComponentNameProps {
 }
 const ComponentName: FC<ComponentNameProps> = ({ car }) => {
   const [selectedImage, setSelectedImage] = useState(0);
-  console.log(car);
   return (
     <div className="flex flex-col gap-6">
       {/* Main Featured Image Container */}

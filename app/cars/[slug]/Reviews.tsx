@@ -210,8 +210,6 @@ export default function Reviews({ carId }: ReviewsProps) {
       })
       .select();
 
-    console.log("Review data:", data);
-    console.log("Review error:", error);
 
     if (error) {
       setError(error.message);

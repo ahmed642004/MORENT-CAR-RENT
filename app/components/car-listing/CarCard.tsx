@@ -6,7 +6,6 @@ import Link from "next/link";
 import { getImageUrl } from "@/lib/utils/storage";
 
 const CarCard = ({ car }: { car: Car }) => {
-  console.log(car)
   return (
     <div className="w-full bg-white rounded-xl p-4 flex flex-col pt-6">
       <div className="flex justify-between items-start">

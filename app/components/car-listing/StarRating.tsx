@@ -6,7 +6,6 @@ interface StarRatingProps {
 }
 
 const StarRating: React.FC<StarRatingProps> = ({ rating }) => {
-  console.log(typeof rating);
   const renderStars = () => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {

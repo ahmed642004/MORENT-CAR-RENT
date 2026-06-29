@@ -40,7 +40,9 @@ export function AuthProvider({
   const supabase = useMemo(() => createClient(), []);
 
   const [user, setUser] = useState<User | null>(initialUser ?? null);
-  const [profile, setProfile] = useState<Profile | null>(initialProfile ?? null);
+  const [profile, setProfile] = useState<Profile | null>(
+    initialProfile ?? null,
+  );
   const [loading, setLoading] = useState(!initialUser); // Only loading if we didn't get initial state
 
   async function loadProfile(userId: string): Promise<Profile | null> {
@@ -126,12 +128,6 @@ export function AuthProvider({
     setUser(null);
     setProfile(null);
   }
-
-  console.log({
-    loading,
-    user,
-    profile,
-  });
 
   return (
     <AuthContext.Provider
