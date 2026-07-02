@@ -33,25 +33,22 @@ export const updateSession = async (request: NextRequest) => {
 
   // IMPORTANT: You must call getUser(). This reads the request cookies,
   // validates the token, and automatically fires a token refresh if expired.
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  const isLoginPage = request.nextUrl.pathname.startsWith('/login');
+  const isLoginPage = request.nextUrl.pathname.startsWith("/login");
+  const nextParam =
+    request.nextUrl.searchParams.get("next") ??
+    request.nextUrl.searchParams.get("returnTo") ??
+    request.nextUrl.searchParams.get("redirectTo");
 
-  // --- Route Guarding Rules ---
-
-  // Rule A: If user is logged out and tries to view protected pages, boot them to login
-  if (!user && !isLoginPage) {
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set(
-      "redirectTo",
-      `${request.nextUrl.pathname}${request.nextUrl.search}`,
-    );
-    return NextResponse.redirect(loginUrl);
-  }
-
-  // Rule B: If user is logged in and tries to access /login, bounce them back to the main app
+  // If user is already logged in and opens /login, send them to their target (if valid) or home.
   if (user && isLoginPage) {
-    const dashboardUrl = new URL('/', request.url); // Adjust if your home route differs
+    const dashboardUrl = new URL(
+      nextParam?.startsWith("/") ? nextParam : "/",
+      request.url,
+    );
     return NextResponse.redirect(dashboardUrl);
   }
 

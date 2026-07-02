@@ -9,7 +9,7 @@ export default async function OrdersPage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login");
+    redirect("/login?next=%2Forders");
   }
 
   const { data: orders } = await supabase
@@ -68,4 +68,3 @@ export default async function OrdersPage() {
     </div>
   );
 }
-

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import { logout } from "@/lib/supabase/server";
@@ -12,6 +13,7 @@ interface NavbarProps {
 }
 
 export default function Navbar({ onToggleFilter }: NavbarProps) {
+  const router = useRouter();
   const { user, loading, profile } = useAuth();
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -66,13 +68,18 @@ export default function Navbar({ onToggleFilter }: NavbarProps) {
   }, []);
 
   const notifications: string[] = [];
+  const settingsHref = user ? "/settings" : "/login?next=%2Fsettings";
+  const ordersHref = user ? "/orders" : "/login?next=%2Forders";
   const profileName =
     profile?.full_name ||
     user?.user_metadata?.full_name ||
     user?.email ||
     "My Account";
-  const profileStatus = loading ? "Checking session" : "Signed in as";
-  console.log(user);
+  const profileStatus = loading
+    ? "Checking session"
+    : user
+      ? "Signed in as"
+      : "Sign in to continue";
   return (
     <header className="bg-white flex items-center w-full h-auto md:h-[128px] border-b border-[#F6F7F9]">
       <div className="container px-6 lg:px-16 flex flex-col md:flex-row md:items-center justify-between md:justify-start w-full py-5 md:py-0 gap-5 md:gap-0">
@@ -152,7 +159,10 @@ export default function Navbar({ onToggleFilter }: NavbarProps) {
                   )}
                 </div>
 
-                <button className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg w-full text-left">
+                <Link
+                  href={settingsHref}
+                  className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg w-full text-left"
+                >
                   <Image
                     src="/setting-2.svg"
                     alt="Setting"
@@ -162,7 +172,7 @@ export default function Navbar({ onToggleFilter }: NavbarProps) {
                   <span className="text-secondary-400 font-medium">
                     Settings
                   </span>
-                </button>
+                </Link>
               </div>
             )}
           </div>
@@ -170,7 +180,14 @@ export default function Navbar({ onToggleFilter }: NavbarProps) {
           {/* Mobile Profile Dropdown Wrapper */}
           <div className="relative" ref={mobileProfileDropdownRef}>
             <button
-              onClick={() => setIsMobileProfileOpen(!isMobileProfileOpen)}
+              onClick={() => {
+                if (!user && !loading) {
+                  router.push(settingsHref);
+                  return;
+                }
+
+                setIsMobileProfileOpen(!isMobileProfileOpen);
+              }}
               className="rounded-full cursor-pointer border border-[#C3D4E9] w-11 h-11 flex items-center justify-center overflow-hidden bg-white focus:outline-none"
             >
               <Image
@@ -182,7 +199,7 @@ export default function Navbar({ onToggleFilter }: NavbarProps) {
               />
             </button>
 
-            {isMobileProfileOpen && (
+            {isMobileProfileOpen && user && (
               <div className="absolute right-0 top-14 w-48 bg-white border border-[#E0E4EC] rounded-xl shadow-lg py-2 z-50">
                 <div className="px-4 py-2 border-b border-[#F6F7F9] mb-1">
                   <p className="text-xs font-medium text-[#90A3BF]">
@@ -193,7 +210,7 @@ export default function Navbar({ onToggleFilter }: NavbarProps) {
                   </p>
                 </div>
                 <Link
-                  href="/orders"
+                  href={ordersHref}
                   className="flex w-full px-4 py-2 text-sm text-[#1A202C] hover:bg-[#F6F7F9] transition-colors"
                 >
                   Orders
@@ -266,7 +283,7 @@ export default function Navbar({ onToggleFilter }: NavbarProps) {
             </li>
             <li>
               <Link
-                href="/settings"
+                href={settingsHref}
                 className="rounded-full cursor-pointer border border-[#C3D4E9] w-11 h-11 flex items-center justify-center transition-colors hover:bg-gray-50"
               >
                 <Image
@@ -282,7 +299,14 @@ export default function Navbar({ onToggleFilter }: NavbarProps) {
           {/* Desktop Profile Dropdown Wrapper */}
           <div className="relative" ref={profileDropdownRef}>
             <button
-              onClick={() => setIsProfileOpen(!isProfileOpen)}
+              onClick={() => {
+                if (!user && !loading) {
+                  router.push(settingsHref);
+                  return;
+                }
+
+                setIsProfileOpen(!isProfileOpen);
+              }}
               className="rounded-full cursor-pointer border border-[#C3D4E9] w-11 h-11 flex items-center justify-center overflow-hidden hover:border-[#3563E9] transition-colors focus:outline-none"
             >
               <Image
@@ -294,7 +318,7 @@ export default function Navbar({ onToggleFilter }: NavbarProps) {
               />
             </button>
 
-            {isProfileOpen && (
+            {isProfileOpen && user && (
               <div className="absolute right-0 mt-2 w-52 bg-white border border-[#E0E4EC] rounded-xl shadow-lg py-2 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
                 <div className="px-4 py-2 border-b border-[#F6F7F9] mb-1">
                   <p className="text-xs font-medium text-[#90A3BF]">
@@ -305,7 +329,7 @@ export default function Navbar({ onToggleFilter }: NavbarProps) {
                   </p>
                 </div>
                 <Link
-                  href="/orders"
+                  href={ordersHref}
                   className="flex w-full px-4 py-2 text-sm text-[#1A202C] hover:bg-[#F6F7F9] transition-colors"
                 >
                   Orders

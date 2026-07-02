@@ -37,7 +37,10 @@ export async function createClient() {
 export async function login(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
-  const redirectTo = formData.get("redirectTo") as string | null;
+  const next =
+    (formData.get("next") as string | null) ??
+    (formData.get("returnTo") as string | null) ??
+    (formData.get("redirectTo") as string | null);
 
   const supabase = await createClient();
 
@@ -54,7 +57,7 @@ export async function login(formData: FormData) {
   revalidatePath("/", "layout");
 
   // 3. Redirect to the requested page or home
-  redirect(redirectTo?.startsWith("/") ? redirectTo : "/");
+  redirect(next?.startsWith("/") ? next : "/");
 }
 export async function signup(formData: FormData) {
   const email = formData.get("email") as string;

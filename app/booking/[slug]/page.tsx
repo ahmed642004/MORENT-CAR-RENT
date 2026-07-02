@@ -16,7 +16,7 @@ export default async function BookingPage({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login");
+    redirect(`/login?next=${encodeURIComponent(`/booking/${slug}`)}`);
   }
 
   const { data: car, error } = await supabase
@@ -35,4 +35,3 @@ export default async function BookingPage({
 
   return <CheckoutForm car={car} />;
 }
-

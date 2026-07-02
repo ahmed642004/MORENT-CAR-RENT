@@ -12,11 +12,11 @@ export default async function SettingsPage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login?redirectTo=/settings");
+    redirect("/login?next=%2Fsettings");
   }
 
   // Fetch profiles table.
-  const { data: profile, error } = await supabase
+  const { data: profile } = await supabase
     .from("profiles")
     .select("*")
     .eq("id", user.id)

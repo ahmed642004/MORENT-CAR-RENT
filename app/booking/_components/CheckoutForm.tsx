@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import {
   useForm,
@@ -266,6 +266,7 @@ function OrderSummary({ car }: { car: CheckoutCar }) {
 
 export default function CheckoutForm({ car }: CheckoutFormProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const supabase = useMemo(() => createClient(), []);
   const { user, loading: authLoading } = useAuth();
   const [toast, setToast] = useState<string | null>(null);
@@ -294,7 +295,7 @@ export default function CheckoutForm({ car }: CheckoutFormProps) {
 
   async function onSubmit(values: CheckoutFormValues) {
     if (!user) {
-      router.replace("/login");
+      router.replace(`/login?next=${encodeURIComponent(pathname)}`);
       return;
     }
 
@@ -327,9 +328,9 @@ export default function CheckoutForm({ car }: CheckoutFormProps) {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      router.replace("/login");
+      router.replace(`/login?next=${encodeURIComponent(pathname)}`);
     }
-  }, [authLoading, router, user]);
+  }, [authLoading, pathname, router, user]);
 
   return (
     <div className="container px-4 py-8 sm:px-6 xl:px-0">

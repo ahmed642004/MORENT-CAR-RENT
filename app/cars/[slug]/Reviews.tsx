@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { useAuth } from "@/app/context/AuthContext";
@@ -74,6 +75,8 @@ function Stars({ rating }: { rating: number }) {
 
 export default function Reviews({ carId }: ReviewsProps) {
   const supabase = useMemo(() => createClient(), []);
+  const pathname = usePathname();
+  const router = useRouter();
 
   const { user, loading: authLoading } = useAuth();
 
@@ -94,6 +97,10 @@ export default function Reviews({ carId }: ReviewsProps) {
   const [submitting, setSubmitting] = useState(false);
 
   const [refresh, setRefresh] = useState(0);
+  const loginHref = useMemo(
+    () => `/login?next=${encodeURIComponent(`${pathname}#reviews`)}`,
+    [pathname],
+  );
 
   useEffect(() => {
     let mounted = true;
@@ -161,7 +168,12 @@ export default function Reviews({ carId }: ReviewsProps) {
 
     const reviewText = comment.trim();
 
-    if (!user || !reviewText) {
+    if (!user) {
+      router.push(loginHref);
+      return;
+    }
+
+    if (!reviewText) {
       setError("Please write a review before submitting.");
 
       return;
@@ -200,7 +212,7 @@ export default function Reviews({ carId }: ReviewsProps) {
       return;
     }
 
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("review")
       .insert({
         car_id: carId,
@@ -209,7 +221,6 @@ export default function Reviews({ carId }: ReviewsProps) {
         comment: reviewText,
       })
       .select();
-
 
     if (error) {
       setError(error.message);
@@ -233,6 +244,7 @@ export default function Reviews({ carId }: ReviewsProps) {
 
   return (
     <section
+      id="reviews"
       className="
         bg-white
         rounded-2xl
@@ -269,7 +281,7 @@ export default function Reviews({ carId }: ReviewsProps) {
 
         {!authLoading && !user && (
           <Link
-            href="/login"
+            href={loginHref}
             className="
               text-sm
               font-semibold

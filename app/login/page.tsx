@@ -19,10 +19,13 @@ export default function LoginPage() {
     setStatusMessage(null);
 
     const formData = new FormData(e.currentTarget);
-    const redirectTo = searchParams.get("redirectTo");
+    const next =
+      searchParams.get("next") ??
+      searchParams.get("returnTo") ??
+      searchParams.get("redirectTo");
 
-    if (redirectTo?.startsWith("/")) {
-      formData.set("redirectTo", redirectTo);
+    if (next?.startsWith("/")) {
+      formData.set("next", next);
     }
 
     try {
